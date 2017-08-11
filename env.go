@@ -66,6 +66,10 @@ func (e *Env) UpdateTokens(appid string) {
 	timestamp := time.Now().Unix()
 
 	e.DB.Update(func(tx *buntdb.Tx) error {
+		tx.Delete(appid + "_timestamp")
+		tx.Delete(appid + "_access_token")
+		tx.Delete(appid + "_expires_in")
+
 		tx.Set(appid+"_timestamp", strconv.FormatInt(timestamp, 10), nil)
 		tx.Set(appid+"_access_token", e.At.AccessToken, nil)
 		tx.Set(appid+"_expires_in", strconv.Itoa(e.At.Expire), nil)
