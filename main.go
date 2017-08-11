@@ -84,6 +84,7 @@ func main() {
 			record_time = env.GetValue(appid, "timestamp")
 			access_token = env.GetValue(appid, "access_token")
 
+		GetToken:
 			// 如果在Access Token数据库中不存在这个appid的token就重新获取
 			if access_token == "" {
 				tjs := env.At.Get(appid, secret)
@@ -93,18 +94,15 @@ func main() {
 					log.Println("ERROR: 没有获得access_token")
 					return ctx.String(http.StatusNotFound, Failed)
 				}
-				goto GetToken
+
+				//获取Token之后更新运行时环境，然后返回access_token
+				env.UpdateTokens(appid)
+
+				content.Status = "success"
+				content.AccessToken = env.At.AccessToken
+				return ctx.JSON(http.StatusOK, content)
 			}
-
 			goto CheckTime
-
-		GetToken:
-			//获取Token之后更新运行时环境，然后返回access_token
-			env.UpdateTokens(appid)
-
-			content.Status = "success"
-			content.AccessToken = env.At.AccessToken
-			return ctx.JSON(http.StatusOK, content)
 
 		CheckTime:
 			// 如果数据库中已经存在了Token，就检查过期时间，如果过期了就去GetToken获取
