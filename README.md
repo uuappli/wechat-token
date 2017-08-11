@@ -15,6 +15,7 @@
 ```bash
 git clone https://github.com/gnuos/wechat-token.git
 cd wechat-token
+go get -v .
 go build
 ```
 
